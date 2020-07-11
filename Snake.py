@@ -6,13 +6,14 @@ import random
 CANVAS_WIDTH = CANVAS_HEIGHT = 800
 CANVAS_BUFFER = 50
 SNAKE_BLOCK_SIZE = 25
-BOARD_SIZE = int((CANVAS_HEIGHT - 2 * CANVAS_BUFFER)/SNAKE_BLOCK_SIZE)
+BOARD_SIZE = int((CANVAS_HEIGHT - 2 * CANVAS_BUFFER) / SNAKE_BLOCK_SIZE)
 SNAKE_INT_SIZE = 3
 BUFFER = 30
 LEFT = "left"
 RIGHT = "right"
 UP = "up"
 DOWN = 'down'
+
 
 # Point class
 class Point:
@@ -26,12 +27,12 @@ class Point:
 
 # Snake game class
 class Snake(tk.Frame):
-
     '''Constructor
         Parameters: self, master
 
         Creates snake game object
     '''
+
     def __init__(self, master=None):
         tk.Frame.__init__(self, master)
         self.pack()
@@ -44,7 +45,7 @@ class Snake(tk.Frame):
         self.snake = []
         self.snake_size = SNAKE_INT_SIZE
         for i in range(self.snake_size):
-            self.snake.append(Point(int(CANVAS_WIDTH/2 + i * SNAKE_BLOCK_SIZE), int(CANVAS_HEIGHT/2)))
+            self.snake.append(Point(int(CANVAS_WIDTH / 2 + i * SNAKE_BLOCK_SIZE), int(CANVAS_HEIGHT / 2)))
 
         # Snake initial direction
         self.direction = RIGHT
@@ -97,7 +98,7 @@ class Snake(tk.Frame):
         self.snake = []
         self.snake_size = SNAKE_INT_SIZE
         for i in range(self.snake_size):
-            self.snake.append(Point(int(CANVAS_WIDTH/2 + i * SNAKE_BLOCK_SIZE), int(CANVAS_HEIGHT/2)))
+            self.snake.append(Point(int(CANVAS_WIDTH / 2 + i * SNAKE_BLOCK_SIZE), int(CANVAS_HEIGHT / 2)))
 
     def draw_food(self):
         self.canvas.create_rectangle(self.food.x, self.food.y,
@@ -108,9 +109,10 @@ class Snake(tk.Frame):
 
     '''Draw_Snake
         Parameters: self
-        
+
         Draws snake on the canvas
     '''
+
     def draw_snake(self):
         self.canvas.delete("all")
         self.draw_board()
@@ -125,9 +127,10 @@ class Snake(tk.Frame):
 
     '''Draw_Board
         Parameters: self
-        
+
         Draws the board onto the widget
     '''
+
     def draw_board(self):
         self.canvas.create_rectangle(CANVAS_BUFFER,
                                      CANVAS_BUFFER,
@@ -140,9 +143,10 @@ class Snake(tk.Frame):
 
     '''Snake_Move
         Parameters: self, direction
-        
+
         Given a direction, function updates the position of the snake and draws it onto the board
     '''
+
     def snake_move(self, direction):
         if self.snake[len(self.snake) - 1] == self.food:
             self.snake_size += 1
@@ -168,9 +172,10 @@ class Snake(tk.Frame):
 
     '''Move_Left
         Parameters: self, tail_x, tail_y
-        
+
         Appends a point onto the left of the tail of the snake
     '''
+
     def move_left(self, tail_x, tail_y):
         if tail_x == CANVAS_BUFFER:
             self.snake.append(Point(CANVAS_WIDTH - CANVAS_BUFFER - SNAKE_BLOCK_SIZE, tail_y))
@@ -179,9 +184,10 @@ class Snake(tk.Frame):
 
     '''Move_Right
         Parameters: self, tail_x, tail_y
-        
+
         Appends a point onto the right of the tail of the snake
     '''
+
     def move_right(self, tail_x, tail_y):
         if tail_x + SNAKE_BLOCK_SIZE == CANVAS_WIDTH - CANVAS_BUFFER:
             self.snake.append(Point(CANVAS_BUFFER, tail_y))
@@ -193,6 +199,7 @@ class Snake(tk.Frame):
 
         Appends a point above the tail of the snake
     '''
+
     def move_up(self, tail_x, tail_y):
         if tail_y == CANVAS_BUFFER:
             self.snake.append(Point(tail_x, CANVAS_HEIGHT - CANVAS_BUFFER - SNAKE_BLOCK_SIZE))
@@ -204,6 +211,7 @@ class Snake(tk.Frame):
 
         Appends a point below the tail of the snake
     '''
+
     def move_down(self, tail_x, tail_y):
         if tail_y + SNAKE_BLOCK_SIZE == CANVAS_HEIGHT - CANVAS_BUFFER:
             self.snake.append(Point(tail_x, CANVAS_BUFFER))
@@ -219,19 +227,19 @@ class Snake(tk.Frame):
         self.play = False
 
     def draw_lose_buttons(self):
-        x1 = CANVAS_WIDTH/2 - CANVAS_BUFFER
-        x2=CANVAS_WIDTH/2 + CANVAS_BUFFER
+        x1 = CANVAS_WIDTH / 2 - CANVAS_BUFFER
+        x2 = CANVAS_WIDTH / 2 + CANVAS_BUFFER
 
-        new_game_button = self.canvas.create_rectangle(int(x1), int((CANVAS_HEIGHT-2 * CANVAS_BUFFER)/2),
-                                                       int(x2), int(CANVAS_HEIGHT/2),
+        new_game_button = self.canvas.create_rectangle(int(x1), int((CANVAS_HEIGHT - 2 * CANVAS_BUFFER) / 2),
+                                                       int(x2), int(CANVAS_HEIGHT / 2),
                                                        fill="grey76", activefill="grey65")
-        quit_button = self.canvas.create_rectangle(int(x1), int((CANVAS_HEIGHT + BUFFER)/2),
-                                                   int(x2), int((CANVAS_HEIGHT + BUFFER + 2 * CANVAS_BUFFER)/2),
+        quit_button = self.canvas.create_rectangle(int(x1), int((CANVAS_HEIGHT + BUFFER) / 2),
+                                                   int(x2), int((CANVAS_HEIGHT + BUFFER + 2 * CANVAS_BUFFER) / 2),
                                                    fill="red2", activefill="red3")
-        new_game_text = self.canvas.create_text(int(CANVAS_WIDTH/2),
-                                                int((CANVAS_HEIGHT - CANVAS_BUFFER)/2), text="New Game")
-        quit_text = self.canvas.create_text(int(CANVAS_WIDTH/2),
-                                            int((CANVAS_HEIGHT + BUFFER + CANVAS_BUFFER)/2), text="Quit")
+        new_game_text = self.canvas.create_text(int(CANVAS_WIDTH / 2),
+                                                int((CANVAS_HEIGHT - CANVAS_BUFFER) / 2), text="New Game")
+        quit_text = self.canvas.create_text(int(CANVAS_WIDTH / 2),
+                                            int((CANVAS_HEIGHT + BUFFER + CANVAS_BUFFER) / 2), text="Quit")
 
         self.canvas.tag_bind(new_game_button, "<Button-1>", self.new_game_button_clicked)
         self.canvas.tag_bind(new_game_text, "<Button-1>", self.new_game_button_clicked)
@@ -248,9 +256,10 @@ class Snake(tk.Frame):
 
     '''Run_Game
         Parameters: self
-        
+
         Executes the object code
     '''
+
     def run_loop(self):
         self.draw_board()
         self.draw_snake()
@@ -260,11 +269,14 @@ class Snake(tk.Frame):
             time.sleep(0.1)
 
     def run_game(self):
-        while self.play:
-            self.reset_game()
-            self.run_loop()
-            self.lose_menu()
-            self.clicked = False
+        try:
+            while self.play:
+                self.reset_game()
+                self.run_loop()
+                self.lose_menu()
+                self.clicked = False
+        except:
+            return
 
 
 def main():
