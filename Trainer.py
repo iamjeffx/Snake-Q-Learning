@@ -1,6 +1,30 @@
 import Snake
+import math
 import numpy as np
 import pandas as pd
+
+EAT_FOOD = 15
+NOTHING = 1
+LOSE = -30
+BOARD_SIZE = 28
+
+
+def construct_q_table(q_table, x_length, y_length):
+    for i in range(1, x_length + 1):
+        for j in range(1, y_length + 1):
+            food = [i, j]
+            for k in range(1, x_length + 1):
+                for l in range(1, y_length + 1):
+                    tail = [k, l]
+                    state = {'Food': food,
+                             'Tail': tail}
+                    q_table.append(state)
+
+
+# Doesn't work for Pandas DataFrame type
+def print_q_table(q_table):
+    for state in q_table:
+        print(state)
 
 
 def run():
@@ -12,13 +36,14 @@ def run():
 def translate_point(point):
     translated_x = (point.get_x() - Snake.CANVAS_BUFFER) / Snake.SNAKE_BLOCK_SIZE + 1
     translated_y = (point.get_y() - Snake.CANVAS_BUFFER) / Snake.SNAKE_BLOCK_SIZE + 1
-    return [translated_x, translated_y]
+    return [int(translated_x), int(translated_y)]
 
 
 def get_state(snake):
     food_point = snake.get_food_position()
     snake_point = snake.get_snake()[snake.get_snake_size() - 1]
-    return [translate_point(food_point), translate_point(snake_point)]
+    return {'Food': translate_point(food_point),
+            'Tail': translate_point(snake_point)}
 
 
 def trainer_run(snake):
@@ -36,7 +61,12 @@ def trainer_run(snake):
 
 
 def main():
-    run()
+    q_table = []
+    construct_q_table(q_table, BOARD_SIZE, BOARD_SIZE)
+    q_table = pd.DataFrame(data=q_table)
+
+    print(q_table)
+    # run()
 
 
 if __name__ == '__main__':
