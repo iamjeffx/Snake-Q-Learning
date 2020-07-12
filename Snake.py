@@ -21,6 +21,15 @@ class Point:
         self.x = x_val
         self.y = y_val
 
+    def get_x(self):
+        return self.x
+
+    def get_y(self):
+        return self.y
+
+    def __str__(self):
+        return 'X: ' + self.get_x() + ' Y: ' + self.get_y()
+
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y
 
@@ -65,6 +74,15 @@ class Snake(tk.Frame):
         keyboard.add_hotkey('down', self.set_direction_down)
         keyboard.add_hotkey('d', self.set_direction_right)
         keyboard.add_hotkey('right', self.set_direction_right)
+
+    def get_food_position(self):
+        return self.food
+
+    def get_snake(self):
+        return self.snake
+
+    def get_snake_size(self):
+        return self.snake_size
 
     def set_direction_up(self):
         self.direction = UP
