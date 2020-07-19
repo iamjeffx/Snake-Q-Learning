@@ -3,7 +3,7 @@ import time
 import keyboard
 import random
 
-CANVAS_WIDTH = CANVAS_HEIGHT = 800
+CANVAS_WIDTH = CANVAS_HEIGHT = 500
 CANVAS_BUFFER = 50
 SNAKE_BLOCK_SIZE = 25
 BOARD_SIZE = int((CANVAS_HEIGHT - 2 * CANVAS_BUFFER) / SNAKE_BLOCK_SIZE)
@@ -13,6 +13,7 @@ LEFT = "Left"
 RIGHT = "Right"
 UP = "Up"
 DOWN = 'Down'
+BOARD_DIM = int((CANVAS_WIDTH - 2 * CANVAS_BUFFER) / SNAKE_BLOCK_SIZE)
 
 
 # Point class
@@ -53,8 +54,8 @@ class Snake(tk.Frame):
         # Initialize Snake
         self.snake = []
         self.snake_size = SNAKE_INT_SIZE
-        initial_point_x = CANVAS_BUFFER + random.randint(0, 24) * SNAKE_BLOCK_SIZE
-        initial_point_y = CANVAS_BUFFER + random.randint(0, 24) * SNAKE_BLOCK_SIZE
+        initial_point_x = CANVAS_BUFFER + random.randint(0, BOARD_DIM - 3) * SNAKE_BLOCK_SIZE
+        initial_point_y = CANVAS_BUFFER + random.randint(0, BOARD_DIM - 1) * SNAKE_BLOCK_SIZE
         for i in range(self.snake_size):
             self.snake.append(Point(initial_point_x + i * SNAKE_BLOCK_SIZE, initial_point_y))
 
@@ -65,8 +66,8 @@ class Snake(tk.Frame):
         self.clicked = False
 
         # Initialize food location
-        self.food = Point(CANVAS_BUFFER + random.randint(0, 14) * SNAKE_BLOCK_SIZE,
-                          CANVAS_BUFFER + random.randint(0, 14) * SNAKE_BLOCK_SIZE)
+        self.food = Point(CANVAS_BUFFER + random.randint(0, BOARD_DIM - 1) * SNAKE_BLOCK_SIZE,
+                          CANVAS_BUFFER + random.randint(0, BOARD_DIM - 1) * SNAKE_BLOCK_SIZE)
 
     def set_hot_keys(self):
         keyboard.add_hotkey('w', self.set_direction_up)
@@ -100,14 +101,14 @@ class Snake(tk.Frame):
         self.direction = RIGHT
 
     def generate_food(self):
-        x_val = random.randint(0, 27)
-        y_val = random.randint(0, 27)
+        x_val = random.randint(0, BOARD_DIM - 1)
+        y_val = random.randint(0, BOARD_DIM - 1)
         new_point = Point(x_val * SNAKE_BLOCK_SIZE + CANVAS_BUFFER,
                           y_val * SNAKE_BLOCK_SIZE + CANVAS_BUFFER)
 
         while new_point in self.snake:
-            x_val = random.randint(0, 27)
-            y_val = random.randint(0, 27)
+            x_val = random.randint(0, BOARD_DIM - 1)
+            y_val = random.randint(0, BOARD_DIM - 1)
             new_point = Point(x_val * SNAKE_BLOCK_SIZE + CANVAS_BUFFER,
                               y_val * SNAKE_BLOCK_SIZE + CANVAS_BUFFER)
 
@@ -118,9 +119,8 @@ class Snake(tk.Frame):
         self.direction = RIGHT
         self.snake = []
         self.snake_size = SNAKE_INT_SIZE
-        self.generate_food()
-        initial_point_x = CANVAS_BUFFER + random.randint(0, 24) * SNAKE_BLOCK_SIZE
-        initial_point_y = CANVAS_BUFFER + random.randint(0, 24) * SNAKE_BLOCK_SIZE
+        initial_point_x = CANVAS_BUFFER + random.randint(0, BOARD_DIM - 3) * SNAKE_BLOCK_SIZE
+        initial_point_y = CANVAS_BUFFER + random.randint(0, BOARD_DIM - 1) * SNAKE_BLOCK_SIZE
         for i in range(self.snake_size):
             self.snake.append(Point(initial_point_x + i * SNAKE_BLOCK_SIZE, initial_point_y))
 
@@ -172,7 +172,6 @@ class Snake(tk.Frame):
     '''
 
     def snake_move(self, direction):
-        print("Snake move called")
         if self.snake[len(self.snake) - 1] == self.food:
             self.snake_size += 1
             self.generate_food()
