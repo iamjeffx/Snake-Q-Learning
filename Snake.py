@@ -9,10 +9,10 @@ SNAKE_BLOCK_SIZE = 25
 BOARD_SIZE = int((CANVAS_HEIGHT - 2 * CANVAS_BUFFER) / SNAKE_BLOCK_SIZE)
 SNAKE_INT_SIZE = 3
 BUFFER = 30
-LEFT = "left"
-RIGHT = "right"
-UP = "up"
-DOWN = 'down'
+LEFT = "Left"
+RIGHT = "Right"
+UP = "Up"
+DOWN = 'Down'
 
 
 # Point class
@@ -53,8 +53,10 @@ class Snake(tk.Frame):
         # Initialize Snake
         self.snake = []
         self.snake_size = SNAKE_INT_SIZE
+        initial_point_x = CANVAS_BUFFER + random.randint(0, 24) * SNAKE_BLOCK_SIZE
+        initial_point_y = CANVAS_BUFFER + random.randint(0, 24) * SNAKE_BLOCK_SIZE
         for i in range(self.snake_size):
-            self.snake.append(Point(int(CANVAS_WIDTH / 2 + i * SNAKE_BLOCK_SIZE), int(CANVAS_HEIGHT / 2)))
+            self.snake.append(Point(initial_point_x + i * SNAKE_BLOCK_SIZE, initial_point_y))
 
         # Snake initial direction
         self.direction = RIGHT
@@ -66,6 +68,7 @@ class Snake(tk.Frame):
         self.food = Point(CANVAS_BUFFER + random.randint(0, 14) * SNAKE_BLOCK_SIZE,
                           CANVAS_BUFFER + random.randint(0, 14) * SNAKE_BLOCK_SIZE)
 
+    def set_hot_keys(self):
         keyboard.add_hotkey('w', self.set_direction_up)
         keyboard.add_hotkey('up', self.set_direction_up)
         keyboard.add_hotkey('a', self.set_direction_left)
@@ -115,8 +118,11 @@ class Snake(tk.Frame):
         self.direction = RIGHT
         self.snake = []
         self.snake_size = SNAKE_INT_SIZE
+        self.generate_food()
+        initial_point_x = CANVAS_BUFFER + random.randint(0, 24) * SNAKE_BLOCK_SIZE
+        initial_point_y = CANVAS_BUFFER + random.randint(0, 24) * SNAKE_BLOCK_SIZE
         for i in range(self.snake_size):
-            self.snake.append(Point(int(CANVAS_WIDTH / 2 + i * SNAKE_BLOCK_SIZE), int(CANVAS_HEIGHT / 2)))
+            self.snake.append(Point(initial_point_x + i * SNAKE_BLOCK_SIZE, initial_point_y))
 
     def draw_food(self):
         self.canvas.create_rectangle(self.food.x, self.food.y,
@@ -166,6 +172,7 @@ class Snake(tk.Frame):
     '''
 
     def snake_move(self, direction):
+        print("Snake move called")
         if self.snake[len(self.snake) - 1] == self.food:
             self.snake_size += 1
             self.generate_food()
@@ -288,6 +295,7 @@ class Snake(tk.Frame):
 
     def run_game(self):
         try:
+            self.set_hot_keys()
             while self.play:
                 self.reset_game()
                 self.run_loop()
@@ -295,6 +303,14 @@ class Snake(tk.Frame):
                 self.clicked = False
         except:
             return
+
+    def __str__(self):
+        result = ''
+        for i in range(self.get_snake_size()):
+            result += str(self.snake[i])
+            if i != self.get_snake_size() - 1:
+                result += ', '
+        return result
 
 
 def main():
