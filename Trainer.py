@@ -25,6 +25,7 @@ BOARD_DIM = int((CANVAS_WIDTH - 2 * CANVAS_BUFFER) / SNAKE_BLOCK_SIZE)
 LR = 0.95
 DR = 0.85
 RANDOMIZE = 0.05
+MAX_ITER = 100
 
 
 def construct_q_table(q_table, x_length, y_length):
@@ -176,9 +177,10 @@ def play(q_table):
 def train(snake, q_table):
     # try:
         for i in range(TRAIN_SIZE):
+            iterations = 0
             snake.draw_board()
             snake.draw_snake()
-            while snake.snake[len(snake.snake) - 1] not in snake.snake[0: len(snake.snake) - 2]:
+            while snake.snake[len(snake.snake) - 1] not in snake.snake[0: len(snake.snake) - 2] & iterations < MAX_ITER:
                 # Perform next move
                 snake.snake_move(snake.direction)
                 snake.update()
