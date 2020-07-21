@@ -1,16 +1,15 @@
 import Snake
 import random
 import numpy as np
-import pandas as pd
 import tkinter as tk
 import time
 
-EAT_FOOD = 3
-NOTHING = 0.01
+EAT_FOOD = 4
+NOTHING = 0
 LOSE = -3
-TRAIN_SIZE = 2500
+TRAIN_SIZE = 1000
 
-CANVAS_WIDTH = CANVAS_HEIGHT = 500
+CANVAS_WIDTH = CANVAS_HEIGHT = 250
 CANVAS_BUFFER = 50
 SNAKE_BLOCK_SIZE = 25
 BOARD_SIZE = int((CANVAS_HEIGHT - 2 * CANVAS_BUFFER) / SNAKE_BLOCK_SIZE)
@@ -23,9 +22,9 @@ DOWN = 'Down'
 BOARD_DIM = int((CANVAS_WIDTH - 2 * CANVAS_BUFFER) / SNAKE_BLOCK_SIZE)
 
 LR = 0.95
-DR = 0.85
-RANDOMIZE = 0.05
-MAX_ITER = 100
+DR = 0.9
+RANDOMIZE = 0.1
+MAX_ITER = 150
 
 
 def construct_q_table(q_table, x_length, y_length):
@@ -35,13 +34,17 @@ def construct_q_table(q_table, x_length, y_length):
             for k in range(1, x_length + 1):
                 for l in range(1, y_length + 1):
                     tail = [k, l]
-                    state = {'Food': food,
-                             'Tail': tail,
-                             'Up': random.uniform(-1, 1),
-                             'Down': random.uniform(-1, 1),
-                             'Left': random.uniform(-1, 1),
-                             'Right': random.uniform(-1, 1)}
-                    q_table.append(state)
+                    for m in range(1, x_length + 1):
+                        for n in range(1, y_length + 1):
+                            head = [m, n]
+                            state = {'Food': food,
+                                     'Tail': tail,
+                                     'Head': head,
+                                     'Up': random.uniform(-1, 1),
+                                     'Down': random.uniform(-1, 1),
+                                     'Left': random.uniform(-1, 1),
+                                     'Right': random.uniform(-1, 1)}
+                            q_table.append(state)
 
 
 # Doesn't work for Pandas DataFrame type
@@ -69,16 +72,21 @@ def translate_point(point):
 
 def get_state(snake):
     food_point = snake.get_food_position()
-    snake_point = snake.get_snake()[len(snake.snake) - 1]
+    snake_head = snake.get_snake()[0]
+    snake_tail = snake.get_snake()[len(snake.get_snake()) - 1]
+
     return {'Food': translate_point(food_point),
-            'Tail': translate_point(snake_point)}
+            'Tail': translate_point(snake_tail),
+            'Head': translate_point(snake_head)}
 
 
-def get_index(food, tail):
+def get_index(food, tail, head):
     food_x = -1
     food_y = -1
     tail_x = -1
     tail_y = -1
+    head_x = -1
+    head_y = -1
 
     if food[0] > BOARD_DIM:
         food_x = 1
@@ -108,10 +116,25 @@ def get_index(food, tail):
     else:
         tail_y = tail[1]
 
+    if head[0] > BOARD_DIM:
+        head_x = 1
+    elif head[0] <= 0:
+        head_x = BOARD_DIM
+    else:
+        head_x = head[0]
+
+    if head[1] > BOARD_DIM:
+        head_y = 1
+    elif head[1] <= 0:
+        head_y = BOARD_DIM
+    else:
+        head_y = head[1]
+
     if food_y < 0 or food_x < 0 or tail_x < 0 or tail_y < 0:
         return -1
 
-    return (food_x - 1) * BOARD_SIZE ** 3 + (food_y - 1) * BOARD_SIZE ** 2 + (tail_x - 1) * BOARD_SIZE + (tail_y - 1)
+    return (food_x - 1) * BOARD_SIZE ** 5 + (food_y - 1) * BOARD_SIZE ** 4 + (tail_x - 1) * BOARD_SIZE ** 3 + \
+           (tail_y - 1) * BOARD_SIZE ** 2 + (head_x - 1) * BOARD_SIZE + (head_y - 1)
 
 
 def get_reward(state, direction, lose, snake):
@@ -158,8 +181,9 @@ def play(q_table):
         state = get_state(snake)
         food = state['Food']
         tail = state['Tail']
+        head = state['Head']
 
-        index = get_index(food, tail)
+        index = get_index(food, tail, head)
         current = q_table[index]
         index_max = np.argmax([current['Up'], current['Down'], current['Left'], current['Right']])
         if (index_max == 0 or state['Food'][1] == state['Tail'][1] - 1) and snake.direction != 'Down':
@@ -175,12 +199,12 @@ def play(q_table):
 
 
 def train(snake, q_table):
-    # try:
+    try:
         for i in range(TRAIN_SIZE):
             iterations = 0
             snake.draw_board()
             snake.draw_snake()
-            while snake.snake[len(snake.snake) - 1] not in snake.snake[0: len(snake.snake) - 2] & iterations < MAX_ITER:
+            while snake.snake[len(snake.snake) - 1] not in snake.snake[0: len(snake.snake) - 2] and iterations < MAX_ITER:
                 # Perform next move
                 snake.snake_move(snake.direction)
                 snake.update()
@@ -189,36 +213,41 @@ def train(snake, q_table):
                 state = get_state(snake)
                 food = state['Food']
                 tail = state['Tail']
+                head = state['Head']
 
                 # Index for current state in Q-table
-                index = get_index(food, tail)
+                index = get_index(food, tail, head)
                 current = q_table[index]
 
                 # Index in Q-table if snake moved up
-                index_up = get_index([food[0], food[1]], [tail[0], tail[1] - 1])
+                index_up = get_index([food[0], food[1]], [tail[0], tail[1]], [head[0], head[1] - 1])
                 if index_up < 0:
-                    print("INVALID INDEX UP: " + str(food[0]) + ", " + str(food[1]) + ", " + str(tail[0]) + ", " + str(tail[1] - 1))
+                    print("INVALID INDEX UP: " + str(food[0]) + ", " + str(food[1]) + ", " +
+                          str(tail[0]) + ", " + str(tail[1] - 1))
                     return
                 next_up = q_table[index_up]
 
                 # Index in Q-table if snake moved down
-                index_down = get_index([food[0], food[1]], [tail[0], tail[1] + 1])
+                index_down = get_index([food[0], food[1]], [tail[0], tail[1]], [head[0], head[1] + 1])
                 if index_down < 0:
-                    print("INVALID INDEX DOWN: " + str(food[0]) + ", " + str(food[1]) + ", " + str(tail[0]) + ", " + str(tail[1] + 1))
+                    print("INVALID INDEX DOWN: " + str(food[0]) + ", " + str(food[1]) + ", " +
+                          str(tail[0]) + ", " + str(tail[1] + 1))
                     return
                 next_down = q_table[index_down]
 
                 # Index in Q-table if snake moved left
-                index_left = get_index([food[0], food[1]], [tail[0] - 1, tail[1]])
+                index_left = get_index([food[0], food[1]], [tail[0], tail[1]], [head[0] - 1, head[1]])
                 if index_left < 0:
-                    print("INVALID INDEX LEFT: " + str(food[0]) + ", " + str(food[1]) + ", " + str(tail[0] - 1) + ", " + str(tail[1]))
+                    print("INVALID INDEX LEFT: " + str(food[0]) + ", " + str(food[1]) + ", " +
+                          str(tail[0] - 1) + ", " + str(tail[1]))
                     return
                 next_left = q_table[index_left]
 
                 # Index in Q-table if snake moved right
-                index_right = get_index([food[0], food[1]], [tail[0] + 1, tail[1]])
+                index_right = get_index([food[0], food[1]], [tail[0] + 1, tail[1]], [head[0] + 1, head[1]])
                 if index_right < 0:
-                    print("INVALID INDEX RIGHT: " + str(food[0]) + ", " + str(food[1]) + ", " + str(tail[0] + 1) + ", " + str(tail[1]))
+                    print("INVALID INDEX RIGHT: " + str(food[0]) + ", " + str(food[1]) + ", " +
+                          str(tail[0] + 1) + ", " + str(tail[1]))
                     return
                 next_right = q_table[index_right]
 
@@ -266,7 +295,14 @@ def train(snake, q_table):
 
                 if q_table[index]['Up'] == 0 and q_table[index]['Down'] == 0 and q_table[index]['Left'] == 0 and q_table[index]['Right'] == 0 or random.random() < RANDOMIZE:
                     index_max = random.randint(0, 3)
-
+                    if index_max == 0:
+                        snake.direction = 'Up'
+                    elif index_max == 1:
+                        snake.direction = 'Down'
+                    elif index_max == 2:
+                        snake.direction = 'Left'
+                    elif index_max == 3:
+                        snake.direction = 'Right'
                 else:
                     index_max = np.argmax(directions)
 
@@ -280,8 +316,8 @@ def train(snake, q_table):
                     snake.direction = 'Right'
             snake.reset_game()
 
-    # except:
-    #     return
+    except:
+        return
 
 
 def main():
