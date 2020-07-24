@@ -1,6 +1,12 @@
 # Snake-Q-Learning
 Q-learning algorithm that trains a model to play snake. Uses a pre-made snake game file in a repository linked here. 
 
+Q-learning is an algorithm based on the ideas of a Markovian-Decision-Process which derives from a simple Markov chain. Basically, the client has many states and each state has multiple actions that the client can take to get to another state. This model can be represented by a finite automata, where the nodes represent states and the directed-weighted edges represent actions. 
+
+The Q-Score is way of numerically representing how well the client is doing in the game and the idea is to take actions that have an optimized Q-Score. This application uses the Bellman equation of learning:
+
+(https://miro.medium.com/max/3276/1*jmcVWHHbzCxDc-irBy9JTw.png)
+
 ## Installation
 Clone the git repository to your local machine.
 ```bash
