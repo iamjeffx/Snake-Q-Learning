@@ -5,7 +5,7 @@ Q-learning is an algorithm based on the ideas of a Markovian-Decision-Process wh
 
 The Q-Score is way of numerically representing how well the client is doing in the game and the idea is to take actions that have an optimized Q-Score. This application uses the Bellman equation of learning:
 
-(https://miro.medium.com/max/3276/1*jmcVWHHbzCxDc-irBy9JTw.png)
+![Bellman Equation](https://miro.medium.com/max/3276/1*jmcVWHHbzCxDc-irBy9JTw.png)
 
 ## Installation
 Clone the git repository to your local machine.
