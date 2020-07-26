@@ -10,7 +10,7 @@ The Q-Score is way of numerically representing how well the client is doing in t
 ## Installation
 Clone the git repository to your local machine.
 ```bash
-git clone <https link>
+git clone https://github.com/iamjeffx/Snake-Q-Learning.git
 ```
 ## Execution
 To run the game, simply execute the driver.
